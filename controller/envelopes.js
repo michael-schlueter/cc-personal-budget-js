@@ -1,15 +1,35 @@
 const modelEnvelopes = require("../model/envelopes");
-const { createId } = require("../utils/helpers");
+const { createId, findById } = require("../utils/helpers");
 
 // @desc    Get all envelopes
 // @route   GET /api/envelopes
-const getAllEnvelopes = async (req, res, next) => {
+const getAllEnvelopes = async (req, res) => {
   try {
     // Simulating DB retrieval
     const envelopes = await modelEnvelopes;
     res.status(200).send(envelopes);
   } catch (err) {
     res.status(400).send(err);
+  }
+};
+
+// @desc    Get a specific envelope
+// @route   GET /api/envelopes/:id
+const getEnvelope = async (req, res) => {
+  try {
+    const envelopes = await modelEnvelopes;
+    const { id } = req.params;
+    const retrievedEnvelope = findById(envelopes, id);
+
+    if (!retrievedEnvelope) {
+      res.status(404).send({
+        message: "Envelope Not Found",
+      });
+    }
+
+    res.status(200).send(retrievedEnvelope);
+  } catch (err) {
+    res.status(500).send(err);
   }
 };
 
@@ -37,4 +57,5 @@ const createEnvelope = async (req, res) => {
 module.exports = {
   getAllEnvelopes,
   createEnvelope,
+  getEnvelope,
 };
