@@ -30,13 +30,15 @@ const findById = (envelopes, id) => {
 
 const getIndex = (envelopes, id) => {
   const envelopeId = parseInt(id);
-  
+
   if (envelopeId === NaN || envelopeId === undefined || envelopeId < 0) {
     console.log("Invalid ID");
     return;
   }
 
-  const retrievedIdx = envelopes.findIndex(envelope => envelope.id === envelopeId);
+  const retrievedIdx = envelopes.findIndex(
+    (envelope) => envelope.id === envelopeId
+  );
 
   if (!retrievedIdx) {
     console.log("Index not found");
@@ -44,7 +46,7 @@ const getIndex = (envelopes, id) => {
   }
 
   return retrievedIdx;
-}
+};
 
 module.exports = {
   createId,

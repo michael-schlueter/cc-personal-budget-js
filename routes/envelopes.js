@@ -5,6 +5,7 @@ const {
   createEnvelope,
   updateEnvelope,
   deleteEnvelope,
+  transferBudget,
 } = require("../controller/envelopes");
 
 const envelopesRouter = express.Router();
@@ -14,5 +15,6 @@ envelopesRouter.get("/:id", getEnvelope);
 envelopesRouter.post("/", createEnvelope);
 envelopesRouter.put("/:id", updateEnvelope);
 envelopesRouter.delete("/:id", deleteEnvelope);
+envelopesRouter.post("/:fromId/transfer/:toId", transferBudget);
 
 module.exports = envelopesRouter;

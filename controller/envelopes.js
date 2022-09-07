@@ -102,7 +102,7 @@ const deleteEnvelope = async (req, res) => {
     if (!envelopeToDelete) {
       res.status(404).send({
         message: "Envelope not found",
-      })
+      });
     }
 
     envelopes.splice(envelopeIdx, 1);
@@ -110,7 +110,43 @@ const deleteEnvelope = async (req, res) => {
   } catch (err) {
     res.status(500).send(err);
   }
-}
+};
+
+const transferBudget = async (req, res) => {
+  try {
+    const envelopes = await modelEnvelopes;
+    const { fromId, toId } = req.params;
+    const amount = parseInt(req.body.amount);
+
+    const sendingEnvelope = findById(envelopes, fromId);
+    const receivingEnvelope = findById(envelopes, toId);
+
+    if (!sendingEnvelope || !receivingEnvelope) {
+      res.status(404).send({
+        message: "Envelope(s) not found",
+      });
+    }
+
+    if (amount < 0) {
+      res.status(400).send({
+        message: "Invalid amount",
+      });
+    }
+
+    if (amount > sendingEnvelope.budget) {
+      res.status(400).send({
+        message: "Insufficient budget for transfer",
+      });
+    }
+
+    sendingEnvelope.budget -= amount;
+    receivingEnvelope.budget += amount;
+
+    res.status(201).send(receivingEnvelope);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+};
 
 module.exports = {
   getAllEnvelopes,
@@ -118,4 +154,5 @@ module.exports = {
   getEnvelope,
   updateEnvelope,
   deleteEnvelope,
+  transferBudget,
 };
