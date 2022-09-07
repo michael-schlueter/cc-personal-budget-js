@@ -54,6 +54,8 @@ const createEnvelope = async (req, res) => {
   }
 };
 
+// @desc    Update an envelope
+// @route   PUT /api/envelopes/:id
 const updateEnvelope = async (req, res) => {
   try {
     const envelopes = await modelEnvelopes;
@@ -88,9 +90,32 @@ const updateEnvelope = async (req, res) => {
   }
 };
 
+// @desc    Delete an envelope
+// @route   DELETE /api/envelopes/:id
+const deleteEnvelope = async (req, res) => {
+  try {
+    const envelopes = await modelEnvelopes;
+    const { id } = req.params;
+    const envelopeToDelete = findById(envelopes, id);
+    const envelopeIdx = getIndex(envelopes, id);
+
+    if (!envelopeToDelete) {
+      res.status(404).send({
+        message: "Envelope not found",
+      })
+    }
+
+    envelopes.splice(envelopeIdx, 1);
+    res.status(204).send(envelopes);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+}
+
 module.exports = {
   getAllEnvelopes,
   createEnvelope,
   getEnvelope,
   updateEnvelope,
+  deleteEnvelope,
 };
