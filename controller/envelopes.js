@@ -1,5 +1,5 @@
 const modelEnvelopes = require("../model/envelopes");
-const { createId, findById } = require("../utils/helpers");
+const { createId, findById, getIndex } = require("../utils/helpers");
 
 // @desc    Get all envelopes
 // @route   GET /api/envelopes
@@ -54,8 +54,43 @@ const createEnvelope = async (req, res) => {
   }
 };
 
+const updateEnvelope = async (req, res) => {
+  try {
+    const envelopes = await modelEnvelopes;
+    const { id } = req.params;
+    const envelopeToUpdate = findById(envelopes, id);
+    const envelopeIdx = getIndex(envelopes, id);
+
+    if (!envelopeToUpdate) {
+      res.status(404).send({
+        message: "Envelope Not Found",
+      });
+    }
+
+    const { title, budget } = req.body;
+
+    if (title && budget) {
+      const updatedEnvelope = {
+        id: envelopeToUpdate.id,
+        title,
+        budget,
+      };
+
+      modelEnvelopes[envelopeIdx] = updatedEnvelope;
+      res.status(200).send(updatedEnvelope);
+    } else {
+      res.status(400).send({
+        message: "title and/or budget not provided",
+      });
+    }
+  } catch (err) {
+    res.status(500).send(err);
+  }
+};
+
 module.exports = {
   getAllEnvelopes,
   createEnvelope,
   getEnvelope,
+  updateEnvelope,
 };
