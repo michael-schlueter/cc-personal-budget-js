@@ -15,9 +15,9 @@ const getAllEnvelopes = async (req, res) => {
       });
     }
 
-    res.status(200).send(envelopes.rows);
+    return res.status(200).send(envelopes.rows);
   } catch (err) {
-    res.status(500).send({
+    return res.status(500).send({
       error: err.message,
     });
   }
@@ -33,14 +33,14 @@ const getEnvelope = async (req, res) => {
     const envelope = await db.query(query, [id]);
 
     if (envelope.rowCount < 1) {
-      res.status(404).send({
+      return res.status(404).send({
         message: "Envelope Not Found",
       });
     }
 
     res.status(200).send(envelope.rows[0]);
   } catch (err) {
-    res.status(500).send({
+    return res.status(500).send({
       message: err.message
     });
   }
@@ -49,21 +49,14 @@ const getEnvelope = async (req, res) => {
 // @desc    Create an envelope
 // @route   POST /api/envelopes
 const createEnvelope = async (req, res) => {
+  const { title, budget } = req.body;
+  const query = 'INSERT INTO envelopes(title, budget) VALUES($1, $2) RETURNING *'
+
   try {
-    const envelopes = await modelEnvelopes;
-    const { title, budget } = req.body;
-    const newId = createId(envelopes);
-
-    const newEnvelope = {
-      id: newId,
-      title,
-      budget,
-    };
-
-    envelopes.push(newEnvelope);
-    return res.status(201).send(newEnvelope);
+    const newEnvelope = await db.query(query, [title, budget]);
+    return res.status(201).send(newEnvelope.rows[0]);
   } catch (err) {
-    res.status(500).send(err);
+    return res.status(500).send(err);
   }
 };
 
