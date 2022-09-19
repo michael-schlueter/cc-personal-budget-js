@@ -1,15 +1,25 @@
+const { db } = require("../model/db");
 const modelEnvelopes = require("../model/envelopes");
 const { createId, findById, getIndex } = require("../utils/helpers");
+
 
 // @desc    Get all envelopes
 // @route   GET /api/envelopes
 const getAllEnvelopes = async (req, res) => {
+  const query = "SELECT * FROM envelopes";
   try {
-    // Simulating DB retrieval
-    const envelopes = await modelEnvelopes;
-    res.status(200).send(envelopes);
+    const envelopes = await db.query(query);
+    if (envelopes.rowCount < 1) {
+      return res.status(404).send({
+        message: "No envelopes found",
+      });
+    }
+
+    res.status(200).send(envelopes.rows);
   } catch (err) {
-    res.status(400).send(err);
+    res.status(500).send({
+      error: err.message,
+    });
   }
 };
 
