@@ -65,36 +65,24 @@ const createEnvelope = async (req, res) => {
 // @desc    Update an envelope
 // @route   PUT /api/envelopes/:id
 const updateEnvelope = async (req, res) => {
+  const { id } = req.params;
+  const { title, budget } = req.body;
+  const query =
+    "UPDATE envelopes SET title = $1, budget = $2 WHERE id = $3 RETURNING *";
   try {
-    const envelopes = await modelEnvelopes;
-    const { id } = req.params;
-    const envelopeToUpdate = findById(envelopes, id);
-    const envelopeIdx = getIndex(envelopes, id);
+    const updatedEnvelope = await db.query(query, [title, budget, id]);
 
-    if (!envelopeToUpdate) {
-      res.status(404).send({
+    if (updatedEnvelope.rowCount < 1) {
+      return res.status(404).send({
         message: "Envelope Not Found",
       });
     }
 
-    const { title, budget } = req.body;
-
-    if (title && budget) {
-      const updatedEnvelope = {
-        id: envelopeToUpdate.id,
-        title,
-        budget,
-      };
-
-      modelEnvelopes[envelopeIdx] = updatedEnvelope;
-      res.status(200).send(updatedEnvelope);
-    } else {
-      res.status(400).send({
-        message: "title and/or budget not provided",
-      });
-    }
+    return res.status(200).send(updatedEnvelope.rows[0]);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send({
+      error: err.message,
+    });
   }
 };
 
