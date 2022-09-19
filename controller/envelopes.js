@@ -26,20 +26,23 @@ const getAllEnvelopes = async (req, res) => {
 // @desc    Get a specific envelope
 // @route   GET /api/envelopes/:id
 const getEnvelope = async (req, res) => {
-  try {
-    const envelopes = await modelEnvelopes;
-    const { id } = req.params;
-    const retrievedEnvelope = findById(envelopes, id);
+  const query = "SELECT * FROM envelopes WHERE id = $1";
+  const { id } = req.params;
 
-    if (!retrievedEnvelope) {
+  try {
+    const envelope = await db.query(query, [id]);
+
+    if (envelope.rowCount < 1) {
       res.status(404).send({
         message: "Envelope Not Found",
       });
     }
 
-    res.status(200).send(retrievedEnvelope);
+    res.status(200).send(envelope.rows[0]);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send({
+      message: err.message
+    });
   }
 };
 
