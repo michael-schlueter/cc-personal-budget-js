@@ -2,7 +2,6 @@ const { db } = require("../model/db");
 const modelEnvelopes = require("../model/envelopes");
 const { createId, findById, getIndex } = require("../utils/helpers");
 
-
 // @desc    Get all envelopes
 // @route   GET /api/envelopes
 const getAllEnvelopes = async (req, res) => {
@@ -41,7 +40,7 @@ const getEnvelope = async (req, res) => {
     res.status(200).send(envelope.rows[0]);
   } catch (err) {
     return res.status(500).send({
-      message: err.message
+      message: err.message,
     });
   }
 };
@@ -50,13 +49,16 @@ const getEnvelope = async (req, res) => {
 // @route   POST /api/envelopes
 const createEnvelope = async (req, res) => {
   const { title, budget } = req.body;
-  const query = 'INSERT INTO envelopes(title, budget) VALUES($1, $2) RETURNING *'
+  const query =
+    "INSERT INTO envelopes(title, budget) VALUES($1, $2) RETURNING *";
 
   try {
     const newEnvelope = await db.query(query, [title, budget]);
     return res.status(201).send(newEnvelope.rows[0]);
   } catch (err) {
-    return res.status(500).send(err);
+    return res.status(500).send({
+      error: err.message,
+    });
   }
 };
 
@@ -99,22 +101,24 @@ const updateEnvelope = async (req, res) => {
 // @desc    Delete an envelope
 // @route   DELETE /api/envelopes/:id
 const deleteEnvelope = async (req, res) => {
-  try {
-    const envelopes = await modelEnvelopes;
-    const { id } = req.params;
-    const envelopeToDelete = findById(envelopes, id);
-    const envelopeIdx = getIndex(envelopes, id);
+  const { id } = req.params;
+  const selectEnvelopeQuery = "SELECT * FROM envelopes WHERE id = $1";
+  const deleteEnvelopeQuery = "DELETE FROM envelopes WHERE id = $1";
 
-    if (!envelopeToDelete) {
+  try {
+    const envelopeToDelete = await db.query(selectEnvelopeQuery, [id]);
+
+    if (envelopeToDelete.rowCount < 1) {
       res.status(404).send({
         message: "Envelope not found",
       });
     }
-
-    envelopes.splice(envelopeIdx, 1);
-    res.status(204).send(envelopes);
+    await db.query(deleteEnvelopeQuery, [id]);
+    return res.status(204);
   } catch (err) {
-    res.status(500).send(err);
+    return res.status(500).send({
+      error: err.message,
+    });
   }
 };
 
