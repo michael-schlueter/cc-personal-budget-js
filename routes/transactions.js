@@ -2,7 +2,7 @@ const express = require("express");
 
 const {
   getAllTransactions,
-//   getTransaction,
+  getTransaction,
 //   createTransaction,
 //   updateTransaction,
 //   deleteTransaction,
@@ -11,7 +11,7 @@ const {
 const transactionsRouter = express.Router();
 
 transactionsRouter.get("/", getAllTransactions);
-// transactionsRouter.get("/:id", getTransaction);
+transactionsRouter.get("/:id", getTransaction);
 // transactionsRouter.post("/", createTransaction);
 // transactionsRouter.put("/:id", updateTransaction);
 // transactionsRouter.delete("/:id", deleteTransaction);
