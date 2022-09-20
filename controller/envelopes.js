@@ -185,6 +185,29 @@ const createTransaction = async (req, res) => {
   }
 };
 
+// @desc    Get all transactions from an envelope
+// @route   GET /api/envelopes/:id/transactions
+const getEnvelopeTransactions = async (req, res) => {
+  const { id } = req.params;
+  const query = "SELECT * from transactions WHERE envelope_id = $1";
+
+  try {
+    const transactions = await db.query(query, [id]);
+
+    if (transactions.rowCount < 1) {
+      return res.status(404).send({
+        message: "No transactions found",
+      });
+    }
+
+    return res.status(200).send(transactions.rows)
+  } catch (err) {
+    return res.status(500).send({
+      error: err.message,
+    })
+  }
+}
+
 module.exports = {
   getAllEnvelopes,
   createEnvelope,
@@ -192,4 +215,5 @@ module.exports = {
   updateEnvelope,
   deleteEnvelope,
   createTransaction,
+  getEnvelopeTransactions,
 };
