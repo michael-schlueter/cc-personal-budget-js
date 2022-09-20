@@ -53,7 +53,14 @@ const createEnvelope = async (req, res) => {
     "INSERT INTO envelopes(title, budget) VALUES($1, $2) RETURNING *";
 
   try {
+    if (!title || !budget) {
+      return res.status(400).send({
+        message: "Title and/or budget not provided!",
+      });
+    }
+
     const newEnvelope = await db.query(query, [title, budget]);
+
     return res.status(201).send(newEnvelope.rows[0]);
   } catch (err) {
     return res.status(500).send({
@@ -70,6 +77,12 @@ const updateEnvelope = async (req, res) => {
   const query =
     "UPDATE envelopes SET title = $1, budget = $2 WHERE id = $3 RETURNING *";
   try {
+    if (!title || !budget) {
+      return res.status(400).send({
+        message: "Title and/or budget not provided!",
+      });
+    }
+
     const updatedEnvelope = await db.query(query, [title, budget, id]);
 
     if (updatedEnvelope.rowCount < 1) {
@@ -101,6 +114,7 @@ const deleteEnvelope = async (req, res) => {
         message: "Envelope not found",
       });
     }
+
     await db.query(deleteEnvelopeQuery, [id]);
     return res.status(204);
   } catch (err) {
