@@ -124,39 +124,64 @@ const deleteEnvelope = async (req, res) => {
   }
 };
 
-const transferBudget = async (req, res) => {
+// @desc    Create a transaction
+// @route   POST /api/envelopes/:id/transactions
+const createTransaction = async (req, res) => {
+  const { id } = req.params;
+  const { title, amount, payment_recipient } = req.body;
+  const date = new Date();
+
+  const envelopeQuery = "SELECT * FROM envelopes WHERE envelopes.id = $1";
+  const transactionQuery =
+    "INSERT INTO transactions(title, amount, date, envelope_id, payment_recipient) VALUES($1, $2, $3, $4, $5) RETURNING *";
+  const updateSendingEnvelopeQuery =
+    "UPDATE envelopes SET budget = budget - $1 WHERE id = $2 RETURNING *";
+  const updateReceivingEnvelopeQuery =
+    "UPDATE envelopes SET budget = budget + $1 WHERE id = $2 RETURNING *";
+
   try {
-    const envelopes = await modelEnvelopes;
-    const { fromId, toId } = req.params;
-    const amount = parseInt(req.body.amount);
+    const envelope = await db.query(envelopeQuery, [id]);
+    if (envelope.rowCount < 1) {
+      return res.status(404).send({
+        message: "Envelope not found",
+      });
+    }
 
-    const sendingEnvelope = findById(envelopes, fromId);
-    const receivingEnvelope = findById(envelopes, toId);
-
-    if (!sendingEnvelope || !receivingEnvelope) {
-      res.status(404).send({
-        message: "Envelope(s) not found",
+    if (!title || !amount || !payment_recipient) {
+      return res.status(400).send({
+        message:
+          "You need to provvide a title, amount and the ID of the payment recipient to create a transaction",
       });
     }
 
     if (amount < 0) {
-      res.status(400).send({
+      return res.status(400).send({
         message: "Invalid amount",
       });
     }
 
-    if (amount > sendingEnvelope.budget) {
-      res.status(400).send({
+    if (amount > envelope.rows[0].budget) {
+      return res.status(400).send({
         message: "Insufficient budget for transfer",
       });
     }
 
-    sendingEnvelope.budget -= amount;
-    receivingEnvelope.budget += amount;
+    const newTransaction = await db.query(transactionQuery, [
+      title,
+      amount,
+      date,
+      id,
+      payment_recipient,
+    ]);
 
-    res.status(201).send(receivingEnvelope);
+    await db.query(updateSendingEnvelopeQuery, [amount, id]);
+    await db.query(updateReceivingEnvelopeQuery, [amount, payment_recipient]);
+
+    return res.status(201).send(newTransaction.rows[0]);
   } catch (err) {
-    res.status(500).send(err);
+    return res.status(500).send({
+      error: err.message,
+    });
   }
 };
 
@@ -166,5 +191,5 @@ module.exports = {
   getEnvelope,
   updateEnvelope,
   deleteEnvelope,
-  transferBudget,
+  createTransaction,
 };
