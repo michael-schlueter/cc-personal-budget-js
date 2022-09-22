@@ -49,37 +49,54 @@ const updateTransaction = async (req, res) => {
   const { id } = req.params;
   const { title, amount } = req.body;
   const selectTransactionQuery = "SELECT * FROM transactions WHERE id = $1";
-  const updateTransactionQuery = "UPDATE transactions SET title = $1, amount = $2 WHERE id = $3 RETURNING *"
+  const updateTransactionQuery =
+    "UPDATE transactions SET title = $1, amount = $2 WHERE id = $3 RETURNING *";
   const updateEnvelopesQuery = "UPDATE envelopes SET budget = $1 WHERE id = $2";
   const selectEnvelopeQuery = "SELECT * FROM envelopes WHERE id = $1";
-  
+
   const transactionToUpdate = await db.query(selectTransactionQuery, [id]);
- 
+
   if (transactionToUpdate.rowCount < 1) {
     return res.status(404).send({
       message: "Transaction not found",
-    })
+    });
   }
-  
-  const sendingEnvelope = await db.query(selectEnvelopeQuery, [transactionToUpdate.rows[0].envelope_id]);
-  const receivingEnvelope = await db.query(selectEnvelopeQuery, [transactionToUpdate.rows[0].payment_recipient]);
-  const amountDifference = parseInt(amount) - parseInt(transactionToUpdate.rows[0].amount);
-  const newSendingEnvelopeBudget = parseInt(sendingEnvelope.rows[0].budget) - amountDifference;
-  const newReceivingEnvelopeBudget = parseInt(receivingEnvelope.rows[0].budget) + amountDifference;
+
+  const sendingEnvelope = await db.query(selectEnvelopeQuery, [
+    transactionToUpdate.rows[0].envelope_id,
+  ]);
+  const receivingEnvelope = await db.query(selectEnvelopeQuery, [
+    transactionToUpdate.rows[0].payment_recipient,
+  ]);
+  const amountDifference =
+    parseInt(amount) - parseInt(transactionToUpdate.rows[0].amount);
+  const newSendingEnvelopeBudget =
+    parseInt(sendingEnvelope.rows[0].budget) - amountDifference;
+  const newReceivingEnvelopeBudget =
+    parseInt(receivingEnvelope.rows[0].budget) + amountDifference;
 
   if (newSendingEnvelopeBudget < 0 || newReceivingEnvelopeBudget < 0) {
     return res.status(400).send({
-      message: "Insufficient budget to update transaction"
-    })
+      message: "Insufficient budget to update transaction",
+    });
   }
 
-  await db.query(updateEnvelopesQuery, [newSendingEnvelopeBudget, transactionToUpdate.rows[0].envelope_id]);
-  await db.query(updateEnvelopesQuery, [newReceivingEnvelopeBudget, transactionToUpdate.rows[0].payment_recipient]);
+  await db.query(updateEnvelopesQuery, [
+    newSendingEnvelopeBudget,
+    transactionToUpdate.rows[0].envelope_id,
+  ]);
+  await db.query(updateEnvelopesQuery, [
+    newReceivingEnvelopeBudget,
+    transactionToUpdate.rows[0].payment_recipient,
+  ]);
 
-  const updatedTransaction = await db.query(updateTransactionQuery, [title, amount, id]);
+  const updatedTransaction = await db.query(updateTransactionQuery, [
+    title,
+    amount,
+    id,
+  ]);
   return res.status(200).send(updatedTransaction.rows[0]);
-
-}
+};
 
 // @desc    Delete a specific transaction
 // @route   DELETE /api/transactions/:id
@@ -95,7 +112,9 @@ const deleteTransaction = async (req, res) => {
 
   try {
     const transactionToDelete = await db.query(selectTransactionQuery, [id]);
-    const receivingEnvelope = await db.query(selectReceivingEnvelope, [transactionToDelete.rows[0].payment_recipient])
+    const receivingEnvelope = await db.query(selectReceivingEnvelope, [
+      transactionToDelete.rows[0].payment_recipient,
+    ]);
 
     if (transactionToDelete.rowCount < 1) {
       return res.status(404).send({
@@ -105,10 +124,14 @@ const deleteTransaction = async (req, res) => {
     console.log(transactionToDelete.rows[0].amount);
     console.log(receivingEnvelope.rows[0].budget);
 
-    if (parseInt(transactionToDelete.rows[0].amount) > parseInt(receivingEnvelope.rows[0].budget)) {
+    if (
+      parseInt(transactionToDelete.rows[0].amount) >
+      parseInt(receivingEnvelope.rows[0].budget)
+    ) {
       return res.status(400).send({
-        message: "Insufficient budget on receiving envelope to delete the transaction",
-      })
+        message:
+          "Insufficient budget on receiving envelope to delete the transaction",
+      });
     }
 
     await db.query(updateSendingEnvelopeQuery, [

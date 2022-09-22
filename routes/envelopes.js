@@ -17,6 +17,6 @@ envelopesRouter.post("/", createEnvelope);
 envelopesRouter.put("/:id", updateEnvelope);
 envelopesRouter.delete("/:id", deleteEnvelope);
 envelopesRouter.post("/:id/transactions/", createTransaction);
-envelopesRouter.get("/:id/transactions", getEnvelopeTransactions)
+envelopesRouter.get("/:id/transactions", getEnvelopeTransactions);
 
 module.exports = envelopesRouter;

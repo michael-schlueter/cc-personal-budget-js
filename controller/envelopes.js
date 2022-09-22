@@ -198,13 +198,13 @@ const getEnvelopeTransactions = async (req, res) => {
       });
     }
 
-    return res.status(200).send(transactions.rows)
+    return res.status(200).send(transactions.rows);
   } catch (err) {
     return res.status(500).send({
       error: err.message,
-    })
+    });
   }
-}
+};
 
 module.exports = {
   getAllEnvelopes,
