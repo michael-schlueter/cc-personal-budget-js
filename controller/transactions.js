@@ -43,6 +43,44 @@ const getTransaction = async (req, res) => {
   }
 };
 
+// @desc    Update a specific transaction
+// @route   PUT /api/transactions/:id
+const updateTransaction = async (req, res) => {
+  const { id } = req.params;
+  const { title, amount } = req.body;
+  const selectTransactionQuery = "SELECT * FROM transactions WHERE id = $1";
+  const updateTransactionQuery = "UPDATE transactions SET title = $1, amount = $2 WHERE id = $3 RETURNING *"
+  const updateEnvelopesQuery = "UPDATE envelopes SET budget = $1 WHERE id = $2";
+  const selectEnvelopeQuery = "SELECT * FROM envelopes WHERE id = $1";
+  
+  const transactionToUpdate = await db.query(selectTransactionQuery, [id]);
+ 
+  if (transactionToUpdate.rowCount < 1) {
+    return res.status(404).send({
+      message: "Transaction not found",
+    })
+  }
+  
+  const sendingEnvelope = await db.query(selectEnvelopeQuery, [transactionToUpdate.rows[0].envelope_id]);
+  const receivingEnvelope = await db.query(selectEnvelopeQuery, [transactionToUpdate.rows[0].payment_recipient]);
+  const amountDifference = parseInt(amount) - parseInt(transactionToUpdate.rows[0].amount);
+  const newSendingEnvelopeBudget = parseInt(sendingEnvelope.rows[0].budget) - amountDifference;
+  const newReceivingEnvelopeBudget = parseInt(receivingEnvelope.rows[0].budget) + amountDifference;
+
+  if (newSendingEnvelopeBudget < 0 || newReceivingEnvelopeBudget < 0) {
+    return res.status(400).send({
+      message: "Insufficient budget to update transaction"
+    })
+  }
+
+  await db.query(updateEnvelopesQuery, [newSendingEnvelopeBudget, transactionToUpdate.rows[0].envelope_id]);
+  await db.query(updateEnvelopesQuery, [newReceivingEnvelopeBudget, transactionToUpdate.rows[0].payment_recipient]);
+
+  const updatedTransaction = await db.query(updateTransactionQuery, [title, amount, id]);
+  return res.status(200).send(updatedTransaction.rows[0]);
+
+}
+
 // @desc    Delete a specific transaction
 // @route   DELETE /api/transactions/:id
 const deleteTransaction = async (req, res) => {
@@ -93,5 +131,6 @@ const deleteTransaction = async (req, res) => {
 module.exports = {
   getAllTransactions,
   getTransaction,
+  updateTransaction,
   deleteTransaction,
 };
