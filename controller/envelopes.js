@@ -1,6 +1,4 @@
 const { db } = require("../model/db");
-const modelEnvelopes = require("../model/envelopes");
-const { createId, findById, getIndex } = require("../utils/helpers");
 
 // @desc    Get all envelopes
 // @route   GET /api/envelopes
@@ -154,13 +152,13 @@ const createTransaction = async (req, res) => {
       });
     }
 
-    if (amount < 0) {
+    if (parseInt(amount) < 0) {
       return res.status(400).send({
         message: "Invalid amount",
       });
     }
 
-    if (amount > envelope.rows[0].budget) {
+    if (parseInt(amount) > parseInt(envelope.rows[0].budget)) {
       return res.status(400).send({
         message: "Insufficient budget for transfer",
       });
