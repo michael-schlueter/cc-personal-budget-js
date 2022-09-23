@@ -161,27 +161,27 @@ envelopesRouter.delete("/:id", deleteEnvelope);
 
 /**
  * @swagger
- * /api/envelopes/{id}/transactions:
+ * /api/v1/envelopes/{id}/transactions:
  *    get:
- *      summary: Get envelope transactions by envelope id
- *    produces:
- *      - application/json
- *    tags:
- *      - Envelopes
- *    parameters:
- *      - in: path
- *        name: id
- *        description: envelope id
- *        type: uuid
- *        required: true
- *        example: 123e4567-e89b-12d3-a456-426614174000
- *    responses:
- *      "200":
- *        description: Returns all transactions for a specific envelope
- *      "404":
- *        description: Envelope not found
- *      "500":
- *        description: Internal server error
+ *      summary: Get envelope transactions by an envelope ID
+ *      produces:
+ *        - application/json
+ *      tags:
+ *        - Envelopes
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          description: envelope id
+ *          type: uuid
+ *          required: true
+ *          example: 123e4567-e89b-12d3-a456-426614174000
+ *      responses:
+ *        "200":
+ *          description: Returns a an envelope along with its data
+ *        "404":
+ *          description: Transactions for the specific envelope not found
+ *        "500":
+ *          description: Internal server error
  */
 envelopesRouter.get("/:id/transactions", getEnvelopeTransactions);
 
