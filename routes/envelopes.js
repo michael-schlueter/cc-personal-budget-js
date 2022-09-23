@@ -45,7 +45,7 @@ envelopesRouter.get("/", getAllEnvelopes);
  *          description: envelope id
  *          type: uuid
  *          required: true
- *          example: 123e4567-e89b-12d3-a456-426614174000
+ *          example: f55bda71-744e-4a4c-b38e-8488d9953165
  *      responses:
  *        "200":
  *          description: Returns an envelope along with its data
@@ -77,9 +77,9 @@ envelopesRouter.get("/:id", getEnvelope);
  *                  type: string
  *                budget:
  *                  type: integer
- *                example:
- *                  title: Rent
- *                  budget: 1000
+ *              example:
+ *                title: Insurances
+ *                budget: 1000
  *      responses:
  *        "201":
  *          description: Returns created envelope
@@ -105,7 +105,7 @@ envelopesRouter.post("/", createEnvelope);
  *          description: envelope ID
  *          type: uuid
  *          required: true
- *          example: 123e4567-e89b-12d3-a456-426614174000
+ *          example: f55bda71-744e-4a4c-b38e-8488d9953165
  *      requestBody:
  *        description: Data for updated envelope
  *        required: true
@@ -118,9 +118,9 @@ envelopesRouter.post("/", createEnvelope);
  *                  type: string
  *                budget:
  *                  type: integer
- *                example:
- *                  title: rent
- *                  budget: 1000
+ *              example:
+ *                title: rent
+ *                budget: 400
  *        responses:
  *          "200":
  *            descriptions: Returns updated envelope
@@ -148,7 +148,7 @@ envelopesRouter.put("/:id", updateEnvelope);
  *          description: Envelope ID to delete
  *          type: uuid
  *          required: true
- *          example: 123e4567-e89b-12d3-a456-426614174000
+ *          example: e7fbc048-edc6-4281-a492-0bd884361a43
  *      responses:
  *        "204":
  *          description: Envelope deleted
@@ -174,7 +174,7 @@ envelopesRouter.delete("/:id", deleteEnvelope);
  *          description: envelope id
  *          type: uuid
  *          required: true
- *          example: 123e4567-e89b-12d3-a456-426614174000
+ *          example: f55bda71-744e-4a4c-b38e-8488d9953165
  *      responses:
  *        "200":
  *          description: Returns a an envelope along with its data
@@ -200,7 +200,7 @@ envelopesRouter.get("/:id/transactions", getEnvelopeTransactions);
  *          description: envelope id
  *          type: uuid
  *          required: true
- *          example: 123e4567-e89b-12d3-a456-426614174000
+ *          example: f55bda71-744e-4a4c-b38e-8488d9953165
  *      requestBody:
  *        description: Data for new envelope transaction
  *        required: true
@@ -213,9 +213,9 @@ envelopesRouter.get("/:id/transactions", getEnvelopeTransactions);
  *                  type: string
  *                amount:
  *                  type: integer
- *                example:
- *                  title: Netflix
- *                  amount: 10
+ *              example:
+ *                title: Netflix
+ *                amount: 10
  *        responses:
  *          "201":
  *            description: Returns created envelope transaction

@@ -41,7 +41,7 @@ transactionsRouter.get("/", getAllTransactions);
  *          description: transaction id
  *          type: uuid
  *          required: true
- *          example: 123e4567-e89b-12d3-a456-426614174000
+ *          example: a85684a5-e6eb-4572-bb78-9a9aaf7a1304
  *      responses:
  *        "200":
  *          description: Returns a transaction along with its data
@@ -67,7 +67,7 @@ transactionsRouter.get("/:id", getTransaction);
  *          description: transaction ID
  *          type: uuid
  *          required: true
- *          example: 123e4567-e89b-12d3-a456-426614174000
+ *          example: a85684a5-e6eb-4572-bb78-9a9aaf7a1304
  *      requestBody:
  *        description: Data for updated transaction
  *        required: true
@@ -76,10 +76,10 @@ transactionsRouter.get("/:id", getTransaction);
  *            schema:
  *              type: object
  *              properties:
- *              title:
- *                type: string
- *              amount:
- *                type: integer
+ *                title:
+ *                  type: string
+ *                amount:
+ *                  type: integer
  *              example:
  *                title: Netflix
  *                amount: 10
@@ -110,7 +110,7 @@ transactionsRouter.put("/:id", updateTransaction);
  *          description: Transaction id to delete
  *          type: uuid
  *          required: true
- *          example: 123e4567-e89b-12d3-a456-426614174000
+ *          example: 003391f5-9e5e-4a07-bcf6-cd71aba35f41
  *      responses:
  *        "204":
  *          description: Transaction deleted
