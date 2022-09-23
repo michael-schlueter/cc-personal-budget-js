@@ -1,26 +1,29 @@
 # Personal Budget
-> Simple Node/Express API to manage a portfolio budget using a budget envelope strategy. Users can create, read, update, and delete envelopes as well as create transactions for each individual envelope.
+> Simple Node/Express API to manage a portfolio budget using a budget envelope strategy. Users can create, read, update, and delete envelopes as well as create, read,  update and delete transactions for each individual envelope.
 
 
 
 ## General Information
 - The project is part of the Back-end Engineer Curriculum from Codecademy
 - I undertook this project in order to solidify my knowledge about creating APIs
-- There are two versions of this project. This project is the basic version using plain JavaScript
+- There are two versions of this project. This project is the basic version using plain JavaScript and node-postgres for interacting with the PostgreSQL database
+- My intention is to compare this version of the project with another version of it using Prisma for interacting with the PostgreSQL database. I want to know the benefits / drawbacks of both in order to decide which one to use in future projects
 
 
 
 ## Technologies Used
 - express 4.18.1
+- node-postgres 0.6.2
+- pg 8.8.0
+- swagger-jsdoc 6.2.5
+- swagger-ui-express 4.5.0
 
 
 
 ## Features
-- Retrieving envelopes (all and single)
-- Creating envelopes
-- Updating envelopes
-- Deleting envelopes
-- Transfering budgets from envelope to envelope
+- Creating, Reading, Updating and Deleting envelopes
+- Creating, Reading, Updating, and Deleting transactions
+- For detailed API documentation take steps described in the setup
 
 
 
@@ -36,18 +39,21 @@ npm install
 ```
 node index.js
 ```
-in your terminal and visit localhost:3000 in your browser.
+in your terminal and visit localhost:3000 in your browser. To read the API documentation visit localhost:3000/api-docs in your browser.
 
 
 
 ## Learnings
 - Designing an API from scratch
 - Importance of data validation
+- Connecting the App to the database using a Pool (setting up the necessary environment variables)
+- Creating queries using node-postgres (db.query)
+- Setting up and using Swagger to create an API documentation
 
 
 
 ## Project Status
-This project will be enhanced in a future Codecademy challenge project where the aim will be to integrate a database for the data to persist. In this version of the project I plan to use node-postgres in combination with a PostgreSQL database. I'd like to compare this version of the project with the Typescript / Prisma version to get a better understanding for the trade-offs. Additionally I may build a frontend to display the envelopes and budgets and to provide CRUD functionality.
+This project is basically finished. I may build a corresponding front-end for it in the future.
 
 
 
